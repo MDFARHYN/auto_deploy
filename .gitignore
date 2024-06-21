@@ -29,7 +29,7 @@ venv/
 access_log
 error_log
 gunicorn_conf.py 
-
+main.py.save
 # Ignore generated files
 *.DS_Store
 Thumbs.db

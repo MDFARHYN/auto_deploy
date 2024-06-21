@@ -6,11 +6,11 @@ import logging
 import subprocess  # For executing shell commands
 import os, sys
 import shutil
-
+from decouple import config
 router = APIRouter()
 
 
-SECRET_KEY = "93b8289e69610df0731f6dd8d09d5bfb16b1f03e7305989a636e6ba40c9626f3"
+SECRET_KEY = config('SECRET_KEY')
 
 async def verify_signature(request: Request, secret_key: str):
     signature_header = request.headers.get('X-Hub-Signature-256')
