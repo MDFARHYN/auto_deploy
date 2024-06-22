@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException,BackgroundTasks
 import hmac
 import hashlib
 import json
-import logging
 import subprocess  # For executing shell commands
 import os, sys
 import shutil
 from pathlib import Path
 from decouple import config
-
+from .track_log import log_function
+import logging
 router = APIRouter()
 
 
@@ -43,6 +43,7 @@ async def verify_signature(request: Request, secret_key: str):
 
 
 #get clone function
+@log_function
 def git_clone(repo_url,folder_name):
     clone_path = f"/var/www/{folder_name}"  # Adjust this path as needed
 
@@ -55,17 +56,29 @@ def git_clone(repo_url,folder_name):
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to clone repository: {e}")
 
+#docker_compose function
+@log_function
+def docker_compose(folder_name):
+    try:
+        subprocess.run(['docker', 'compose', "build", "--no-cache"], cwd=folder_name, check=True)
+        subprocess.run(['docker', 'compose', "up", "-d"], cwd=folder_name, check=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Failed to docker compose: {e}")
 
 
 @router.post("/webhook_farhyn", tags=["farhyn_webhook"])
-async def farhyn_webhook(request: Request):
+async def farhyn_webhook(request: Request,background_tasks: BackgroundTasks):
     try:
+        logging.info("Received webhook request")
         await verify_signature(request, SECRET_KEY)
-        git_clone("git@github.com:MDFARHYN/farhyn2024_portfolio.git","farhyn2024_portfolio")
+        # Add tasks to background tasks
+        background_tasks.add_task(git_clone,"git@github.com:MDFARHYN/farhyn2024_portfolio.git", "farhyn2024_portfolio")
+        background_tasks.add_task(docker_compose,"/var/www/farhyn2024_portfolio/frontend")
         payload = await request.json()
+        logging.info(f"Webhook processed successfully, payload: {payload}")
 
-
-        return {"message": "Signature verified successfully.Docker Compose redeployment successful", "data": payload}
+        return {"message": "Signature verified successfully", "data": payload}
     except HTTPException as e:
+        logging.error(f"Exception occurred for /webhook_farhyn api: {str(ex)}")
         return {"error": str(e.detail)}
 
