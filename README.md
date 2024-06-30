@@ -53,11 +53,11 @@ Auto Deploy simplifies your deployment process by automating the following steps
 2. **give the folder path**:
 
       ```
-         background_tasks.add_task(git_clone, "git repo url", "/var/www/root_folder_name") #root folder name where docker file is located
+         background_tasks.add_task(git_clone, "git repo url", "/var/www/git_folder_name") #main folder name of git repo  
       ```
       
       ```
-         background_tasks.add_task(docker_compose, "/var/www/root_folder_name") #root folder name where docker is file located
+         background_tasks.add_task(docker_compose, "/var/www/root_folder_name") #root folder name where docker file is located
       ```
 
 ## 📋 Code Explanation
@@ -92,8 +92,8 @@ async def farhyn_webhook(request: Request, background_tasks: BackgroundTasks):
     try:
         logging.info("Received webhook request")
         await verify_signature(request, SECRET_KEY)
-        background_tasks.add_task(git_clone, "git repo url", "/var/www/root_folder_name") #root folder name where docker file is located  
-        background_tasks.add_task(docker_compose, "/var/www/root_folder_name") #root folder name where docker is file located  
+        background_tasks.add_task(git_clone, "git repo url", "/var/www/git_folder_name") #main folder name of git repo  
+        background_tasks.add_task(docker_compose, "/var/www/root_folder_name") #root folder name where docker file is located  
         payload = await request.json()
         logging.info(f"Webhook processed successfully, payload: {payload}")
 
