@@ -1,0 +1,42 @@
+
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Ignore environment and virtualenv files
+.env
+env/
+venv/
+*.env
+
+# Ignore dependencies
+/.venv
+/node_modules
+
+# Ignore local development settings for Django
+*.sqlite3
+*.pyc
+
+# Ignore local development settings for FastAPI
+*.log
+log/
+logs/
+# Ignore IDE and editor-specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+access_log
+error_log
+gunicorn_conf.py 
+main.py.save
+# Ignore generated files
+*.DS_Store
+Thumbs.db
+
+# Ignore sensitive or personal configuration files
+config.yaml
+config.ini
+
+# Add any additional files or directories to ignore as needed
